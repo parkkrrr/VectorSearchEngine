@@ -1,0 +1,19 @@
+extends layout
+
+block content
+ h1 Upload a Text File or Enter Text
+ form(action="/ingest" method="POST" enctype="multipart/form-data" class="mt-4")
+      .mb-3
+      div
+        label.form-label(for="text") Text:
+        textarea.form-control(name="text" rows="10" cols="50")
+      div
+        label.form-label(for="metadata") Metadata (optional):
+        input.form-control(type="text" name="metadata")
+      div
+        label.form-label(for="file") Or Upload a .txt File:
+        input.form-control(type="file" name="file")
+      div
+        button.btn.btn-primary(type="submit") Submit
+ hr
+ a.btn.btn-secondary.mt-3(href="/search") Go to Search

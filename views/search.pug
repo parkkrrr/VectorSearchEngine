@@ -1,0 +1,35 @@
+extends layout
+
+block content
+
+  a.btn.btn-secondary.mb-3(href="/") ⬅ Back to Ingest
+  form(method="GET", action="/search", class="mt-4")
+    .mb-3
+      label.form-label(for="query") Search Query
+      input.form-control(name="query", type="text", value=query, required)
+    .mb-3
+      label.form-label(for="topN") Results per Page
+      input.form-control(name="topN", type="number", value=topN, min="1")
+    input(type="hidden", name="page", value="1")
+    button.btn.btn-success(type="submit") Search
+
+  if results && results.length
+    h2.mt-4 Results
+    ul.list-group
+      each doc in results
+        li.list-group-item
+          strong= doc.text
+          br
+          if doc.metadata
+            small.text-muted Metadata: #{doc.metadata}
+          br
+          small.text-muted Score: #{doc.score.toFixed(4)}
+  else
+    p.mt-3.text-muted No results found.
+
+  // Pagination Controls
+  .mt-4
+    if page > 1
+      a.btn.btn-secondary(href=`/search?query=${query}&topN=${topN}&page=${page-1}`) « Previous
+    if hasNextPage
+      a.btn.btn-primary.ms-2(href=`/search?query=${query}&topN=${topN}&page=${page+1}`) Next »
