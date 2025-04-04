@@ -99,7 +99,7 @@ Search form UI — enter query, topN, and view paginated results.
 - **TF-IDF** vectorization is used behind the scenes.
 - File uploads:
   - Must be plain `.txt`
-  - Metadata should be passed **inside the file** in first line
+  - Metadata is same as **filename** 
 - Results are paginated using `topN` and `page` params.
 - Cosine similarity scores are shown for each result.
 
