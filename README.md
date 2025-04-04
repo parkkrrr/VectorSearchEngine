@@ -1,5 +1,3 @@
-
-
 # 🧠 Vector-Based Text Search Engine (TF-IDF)
 
 This project allows you to **ingest `.txt` documents or raw text**, vectorize them using **TF-IDF**, and perform **cosine similarity-based search** across them.
@@ -15,13 +13,19 @@ This project allows you to **ingest `.txt` documents or raw text**, vectorize th
 
 ---
 
-## 🚀 Getting Started
-
-### 📦 Install Dependencies
-
-```bash
-npm install
-```
+## 🚀 **How to Run**  
+1. **Install dependencies**  
+   ```bash
+   npm install
+   ```
+2. **Start the server**  
+   ```bash
+   npm start
+   ```
+3. **Open in browser**:  
+   - Upload documents at **`/`**  
+   - Search documents at **`/search`**  
+   - View documents via **`/document/:id`**  
 
 Make sure you have:
 - `express`
@@ -44,9 +48,10 @@ MONGO_URI=mongodb://localhost:27017/vector_search
 
 ## 🔌 Available Routes
 
-### 📥 `POST /ingest`
+### 📥 **`POST /ingest`**
 
-Ingest a new document.
+#### **Description:**  
+Uploads and stores text documents in MongoDB, either via direct text input or a `.txt` file.  
 
 #### Request Type: `multipart/form-data`
 
@@ -60,14 +65,43 @@ Ingest a new document.
 >  
 > ✅ If both `text` and `file` are provided, file content overrides `text`.
 
+
+#### **Request Parameters:**  
+- **Body (for text input)**:  
+  ```json
+  {
+    "text": "Your document content here",
+    "metadata": "Optional metadata"
+  }
+  ```
+- **Form Data (for file input, `.txt` only)**:  
+  - `file`: Upload a `.txt` file (content is stored in MongoDB, not on disk).  
+  - Metadata is taken from the file’s **original name**.  
+
+#### **Response:**  
+- **Success (201 Created)**:  
+  ```json
+  {
+    "message": "Document stored successfully",
+    "id": "67f01708f532dcf218e00fc8"
+  }
+  ```
+- **Error (400 Bad Request)**:  
+  ```json
+  {
+    "error": "No text provided"
+  }
+  ```
+
+
 ---
 
-### 🔍 `GET /search`
+###  **`GET /search`**
 
-Search for documents based on a query string.
+#### **Description:**  
+Searches stored documents using **TF-IDF vectorization** and **cosine similarity**.  
 
-#### Query Parameters:
-
+#### **Query Parameters:**  
 | Param   | Type     | Description                                  |
 |---------|----------|----------------------------------------------|
 | `query` | string   | The search query                             |
@@ -80,8 +114,50 @@ Search for documents based on a query string.
 GET /search?query=machine+learning&topN=10&page=2
 ```
 
+#### **Response:**  
+- **Success (HTML Page Rendered)**:  
+  Displays search results with **View** buttons.  
+- **Error (400 Bad Request)**:  
+  ```json
+  {
+    "error": "Query parameter is required"
+  }
+  ```
+
 Returns a rendered HTML view of relevant documents ranked by cosine similarity.
 
+---
+
+
+### **GET `/document/:id`**  
+
+#### **Description:**  
+Retrieves and displays a stored document from MongoDB using its unique ID.  
+
+#### **URL Parameter:**  
+- `:id` (required): The document’s MongoDB `_id`.  
+
+#### **Response:**  
+- **Success (HTML Page Rendered)**:  
+  Displays the document content.  
+- **Error (404 Not Found)**:  
+  ```json
+  {
+    "error": "Document not found"
+  }
+  ```
+
+#### **Example Usage:**  
+- **Request:**  
+  ```http
+  GET /document/67f01708f532dcf218e00fc8
+  ```
+- **Response (HTML Page)**:  
+  ```plaintext
+  Document Details
+  Metadata: myfile.txt
+  Content: This is the text stored in MongoDB.
+  ```
 ---
 
 ### 🌐 `GET /`
@@ -94,14 +170,19 @@ Search form UI — enter query, topN, and view paginated results.
 
 ---
 
-## 📝 Notes
+## **🔗 Navigation & UI Enhancements**  
+- The **Search UI** has a "View" button to open documents dynamically.  
+- A **Back button** in the document viewer allows users to return to search results.  
 
-- **TF-IDF** vectorization is used behind the scenes.
-- File uploads:
-  - Must be plain `.txt`
-  - Metadata is same as **filename** 
-- Results are paginated using `topN` and `page` params.
-- Cosine similarity scores are shown for each result.
+---
+
+## **💡 Notes & Limitations** 
+✔ **TF-IDF** vectorization is used behind the scenes.
+✔ **Files are NOT stored locally**—they are processed in memory and stored in MongoDB.  
+✔ **Only `.txt` files** are accepted. Any other format will be rejected.  
+✔ **The first line of a file is NOT treated as metadata**—instead, the filename is used.  
+✔ **Cosine similarity** scores are shown for each result.
+✔ **Results are paginated** using `topN` and `page` params.
 
 ---
 
