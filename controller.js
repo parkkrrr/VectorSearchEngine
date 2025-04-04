@@ -1,19 +1,44 @@
 const Document = require("./Document.model.js");
 const fs = require("fs");
 const { vectorizeTFIDF, cosineSimilarity } = require("./vectorization");
+
+ async function getDocument(req, res) {
+  try {
+    const { id } = req.params;
+    const document = await Document.findById(id);
+
+    if (!document) {
+      return res.status(404).json({ error: "Document not found" });
+    }
+
+    res.render("document",{
+      id: document._id,
+      text: document.text,
+      metadata: document.metadata || "No metadata available",
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 async function ingest(req, res) {
   let { text } = req.body;
   let { metadata } = req.body;
 
   // If a file is uploaded, extract content
   if (req.file) {
-    const filePath = req.file.path;
-    const fileContent = fs.readFileSync(filePath, { encoding: "utf-8" });
+    // const filePath = req.file.path;
+    // const fileContent = fs.readFileSync(filePath, { encoding: "utf-8" });
 
-    // Assume file contains metadata in the first line, and rest is text
-    const lines = fileContent.split("\n");
-    metadata = lines[0].trim();
-    text = lines.slice(1).join("\n").trim();
+    // // Assume file contains metadata in the first line, and rest is text
+    // const lines = fileContent.split("\n");
+    // metadata = lines[0].trim();
+    // text = lines.slice(1).join("\n").trim();
+
+    const fileContent = req.file.buffer.toString("utf-8"); 
+    metadata = req.file.originalname;
+    text = fileContent.trim();
+
   }
 
   if (!text) {
@@ -61,4 +86,4 @@ async function search(req, res) {
   });
 }
 
-module.exports = { search, ingest };
+module.exports = { search, ingest,getDocument };
